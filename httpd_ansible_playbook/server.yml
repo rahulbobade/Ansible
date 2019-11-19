@@ -1,0 +1,40 @@
+---
+ - name: internet services
+   hosts: node1.rahul.com
+   become: yes
+   tasks: 
+    - block:
+       - name: latest httpd version install
+         yum: 
+          name: httpd
+          state: latest
+       - name: latest firewall version install
+         yum:
+          name: firewalld
+          state: latest
+    - block:
+       - name: firewall permits httpd service 
+         firewalld:
+          service: http 
+          permanent: true
+          state: enabled
+          immediate: yes
+    - block:
+       - name: firewalld enable and running 
+         service:
+          name: httpd
+          enabled: true 
+          state: started 
+    - block: 
+       - name: test html page 
+         copy: 
+           content: "welcome to the my page !\n"
+           dest: /var/www/html/index.html
+ - name: test
+   hosts: localhost 
+   tasks: 
+     - name: connect to internet 
+       uri: 
+        url: http://node1.rahul.com
+       
+
